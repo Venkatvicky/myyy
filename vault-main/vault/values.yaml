@@ -1,0 +1,15 @@
+vault:
+  replicas: 1
+  image: hashicorp/vault:1.15.4
+  storage: 5Gi
+  ingress:
+    enabled: true
+    host: vault.example.com
+
+postgres:
+  replicas: 1
+  image: postgres:15
+  storage: 5Gi
+  db_name: vaultdb
+  db_user: vault
+  db_password: password

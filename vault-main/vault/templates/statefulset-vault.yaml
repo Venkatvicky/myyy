@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+  labels:
+    app: vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  serviceName: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      serviceAccountName: vault
+      containers:
+        - name: vault
+          image: hashicorp/vault:1.15.4
+          args:
+            - "server"
+          env:
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              value: "root"
+            - name: VAULT_DB_USER
+              value: "vault"
+            - name: VAULT_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vault-db-secret
+                  key: password
+            - name: VAULT_ADDR
+              value: "http://0.0.0.0:8200"
+          ports:
+            - containerPort: 8200
+          volumeMounts:
+  - name: vault-storage
+    mountPath: /vault/data
+volumes:
+  - name: vault-storage
+    persistentVolumeClaim:
+      claimName: vault-pvc
+
